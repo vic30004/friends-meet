@@ -1,14 +1,25 @@
-const Meeting= `
+const Meeting = `
 type Meeting{
     id:ID!, 
-    users: [User]!,
+    users: [MeetingUsers],
     link: String, 
     ownerId: ID!
 }
 
-type Query{
-    meeting(id:ID!): Meeting
+input MeetingId{
+    id: ID!
 }
-`
+type Query{
+    meeting(input:MeetingId!): Meeting
+}
 
-module.exports=Meeting
+input createMeeting{
+    ownerId: ID!
+}
+
+type Mutation{
+    createMeeting(input: createMeeting!): Meeting
+}
+`;
+
+module.exports = Meeting;

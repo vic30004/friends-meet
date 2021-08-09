@@ -2,11 +2,14 @@ const Chat = `
 type Chat{
      id: ID!,
     comments: [Comments],
-    meetingId: ID   
+    meetingId: ID,
 }
 
+input MeedingId{
+    id:ID!
+}
 type Query{
-    chat: [Chat]
+    chat(input: MeedingId!): Chat
 }
 `;
 
