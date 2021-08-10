@@ -27,7 +27,7 @@ exports.createMeeting = async (input, db) => {
 
 exports.getUsers = async (meetings, db) => {
   const meetingId = meetings.id;
-  return await db("meetingUsers").where({
+  return await db("meeting_users").where({
     meetingId,
   });
 };

@@ -1,5 +1,5 @@
 exports.up = function (knex) {
-  return knex.schema.createTable("meetingRoom", (t) => {
+  return knex.schema.createTable("meeting_room", (t) => {
     t.increments("id").primary();
     t.integer("userId")
       .references("id")
@@ -16,5 +16,5 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
-  return knex.schema.dropTable("meetingRoom");
+  return knex.schema.dropTable("meeting_room");
 };

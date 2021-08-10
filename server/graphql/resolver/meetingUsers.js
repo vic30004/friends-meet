@@ -2,13 +2,13 @@ const { emailCheck } = require("../../helper/helper");
 
 exports.meetingUsers = async (input, db) => {
   const { meetingId } = input;
-  return await db("meetingUsers").where({ meetingId });
+  return await db("meeting_users").where({ meetingId });
 };
 
 exports.addUserToMeeting = async (input, db) => {
   const { email, meetingId } = input;
 
-  const checkIfUserInMeeting = await db("meetingUsers").where({
+  const checkIfUserInMeeting = await db("meeting_users").where({
     email,
     meetingId,
   });
@@ -17,7 +17,7 @@ exports.addUserToMeeting = async (input, db) => {
   }
 
   if (emailCheck(email)) {
-    const user = await db("meetingUsers")
+    const user = await db("meeting_users")
       .insert({ email, meetingId })
       .returning("*");
     return { ...user[0] };
@@ -33,7 +33,7 @@ exports.updateMeetingUserName = async (input, db) => {
       return new Error("Please add a valid email");
     }
 
-    const user = await db("meetingUsers")
+    const user = await db("meeting_users")
       .where({ id, email })
       .update({ name })
       .returning("*");

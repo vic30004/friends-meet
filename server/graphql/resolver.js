@@ -9,7 +9,12 @@ const {
 } = require("./resolver/meetingUsers");
 const { constants } = require("./constants");
 const { comments } = require("./resolver/comments");
-const { meetingRoom, getOwner, getMember } = require("./resolver/meetingRoom");
+const {
+  meetingRoom,
+  getOwner,
+  getMember,
+  addMember,
+} = require("./resolver/meetingRoom");
 const Meeting = require("./schema/meetingSchema");
 const pubsub = new PubSub();
 
@@ -76,6 +81,10 @@ const resolvers = {
     },
     async AddComment(_, { input }, { db }) {
       return addComment(input, db);
+    },
+
+    async addMember(_, { input }, { db }) {
+      return addMember(input, db);
     },
   },
   Subscription: {

@@ -10,7 +10,7 @@ exports.up = function (knex) {
         .onDelete("CASCADE");
       t.integer("meetingUsersId")
         .references("id")
-        .inTable("meetingUsers")
+        .inTable("meeting_users")
         .onUpdate("CASCADE")
         .onDelete("CASCADE");
       t.integer("chatId")

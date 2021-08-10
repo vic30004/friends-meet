@@ -15,12 +15,13 @@ type Query{
 }
 
 input Member{
+    meetingId: ID!
     email: String!
 }
 type Mutation{
-    addMember(input:Member):MeetingUsers
+    addMember(input:Member):MeetingRoom
     removeMember(input:Member): String
 }
 `;
 
-module.exports = MeetingRoom
+module.exports = MeetingRoom;
