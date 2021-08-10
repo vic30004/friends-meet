@@ -1,24 +1,33 @@
-const mockMeeting = [
-  {
-    id: 1,
-    users: [
-      { id: 1, email: "victor@gmail.com", name: "" },
-      { id: 2, email: "vic@gmail.com", name: "" },
-    ],
-    link: "http://linktomeeting.com/1",
-    ownerId: 1,
-  },
-  {
-    id: 2,
-    users: [
-      { id: 1, email: "victor@gmail.com", name: "" },
-      { id: 2, email: "vic@gmail.com", name: "" },
-    ],
-    link: "http://linktomeeting.com/1",
-    ownerId: 2,
-  },
-];
+const { randomIdGen } = require("../../helper/helper");
 
-exports.meeting = (parent, args) => {
-  return mockMeeting.find((meeting) => meeting.id === +args.id);
+exports.meeting = async (input, db) => {
+  const { id } = input;
+  const meeting = await db("meetings").where({ id });
+  if (meeting.length < 1) {
+    throw new Error("Meeting does not exist");
+  }
+  return {
+    ...meeting[0],
+  };
+};
+
+exports.createMeeting = async (input, db) => {
+  const { ownerId } = input;
+
+  const linkId = randomIdGen();
+  const link = `http://localhost:4000/${linkId}`;
+
+  const meeting = await db("meetings").insert({ link, ownerId }).returning("*");
+  const meetingId = meeting[0].id;
+
+  await db("chat").insert({ meetingId });
+
+  return { ...meeting[0] };
+};
+
+exports.getUsers = async (meetings, db) => {
+  const meetingId = meetings.id;
+  return await db("meetingUsers").where({
+    meetingId,
+  });
 };

@@ -1,11 +1,16 @@
-const userArr = [{ id: 1, email: "victor@gmail.com", name: "" }];
+const { emailCheck } = require("../../helper/helper");
 
-const users = () => userArr;
-
-const addUser = ( args) => {
-  userArr.push({ id: 2, email: args.id, name: args.name });
-  const user = userArr.find((user) => user.id === 2);
-  return user[0];
+exports.users = async (db) => {
+  return await db("users");
 };
 
-module.exports = { users, addUser };
+exports.addUser = async (input, db) => {
+  const { email, name } = input;
+  if (emailCheck(email)) {
+    const user = await db("users").insert({ email, name }).returning("*");
+    return { ...user[0] };
+  }
+  return new Error("Please add a valid email");
+};
+
+ 

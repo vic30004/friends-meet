@@ -2,6 +2,7 @@ exports.up = function (knex) {
   return knex.schema.createTable("meetings", (table) => {
     table.increments("id").primary();
     table.string("link").unique();
+    table.timestamps(true, true);
     table
       .integer("ownerId")
       .references("id")
