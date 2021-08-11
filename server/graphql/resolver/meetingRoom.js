@@ -1,37 +1,81 @@
+const { constants } = require("../constants");
+
 exports.meetingRoom = async (input, db) => {
   const { meetingId } = input;
   return await db("meeting_room").where({ meetingId });
 };
 
 exports.getOwner = async (meeting, db) => {
-  const id = meeting.meetingId;
-  const user = await db("users")
-    .join("meetings", "users.id", "meetings.ownerId")
-    .select("users.id", "users.name", "users.email")
-    .where({ "meetings.ownerId": id });
+  const id = meeting.ownerId;
+  const meetingId = meeting.meetingId;
+  if (id) {
+    const user = await db("users").where({ id });
+    return { ...user[0] };
+  }
+  const usersMeeting = await db("meetings").where({ id: meetingId });
+  const userId = usersMeeting[0].id;
+  const user = await db("users").where({ id: userId });
   return { ...user[0] };
 };
 
 exports.getMember = async (meeting, db) => {
-  const id = meeting.userId;
-  const user = await db("meeting_users").where({ id });
-  return { ...user[0] };
+  const id = meeting.memberId;
+  if (id) {
+    const user = await db("meeting_users").where({ id });
+    return { ...user[0] };
+  }
 };
 
-exports.addMember = async (input, db) => {
+exports.addMember = async (input, db, pubsub) => {
   const { email, meetingId } = input;
+  let memberId;
+  let ownerId;
+  let user = await db("meeting_users").where({ email, meetingId });
+  if (user.length === 0) {
+    user = await db("users").where({ email });
+    memberId = null;
+    ownerId = user[0].id;
+  }
 
-  const user = await db("meeting_users").where({ email, meetingId });
   if (user.length > 0) {
     try {
-      const userId = user[0].id;
-      const meetingUser = await db("meeting_room").where({ meetingId, userId });
+      if (ownerId) {
+        const meeting = await db("meetings").where({ ownerId, id: meetingId });
+        if (meeting.length === 0) {
+          return new Error(
+            "oops, it looks like you were not invited to this meeting."
+          );
+        }
+        const meetingUser = await db("meeting_room").where({
+          meetingId,
+          ownerId,
+        });
+        console.log(meetingUser);
+        if (meetingUser.length > 0) {
+          return new Error("You are already in the room");
+        }
+        const addedUser = await db("meeting_room")
+          .insert({ ownerId, meetingId })
+          .returning("*");
+        pubsub.publish(constants.MEMBER_JOINED, {
+          memberJoined: `${user[0].name} joined the room`,
+        });
+        return { ...addedUser[0] };
+      }
+      memberId = user[0].id;
+      const meetingUser = await db("meeting_room").where({
+        meetingId,
+        memberId,
+      });
       if (meetingUser.length > 0) {
         return new Error("You are already in the room");
       }
       const addedUser = await db("meeting_room")
-        .insert({ userId, meetingId })
+        .insert({ memberId, meetingId })
         .returning("*");
+      pubsub.publish(constants.MEMBER_JOINED, {
+        memberJoined: `${user[0].name} joined the room`,
+      });
       return { ...addedUser[0] };
     } catch (error) {
       console.log(error);
@@ -39,4 +83,23 @@ exports.addMember = async (input, db) => {
     }
   }
   return new Error("oops, it looks like you were not invited to this meeting.");
+};
+
+exports.removeMember = async (input, db, pubsub) => {
+  const { meetingId, memberId, ownerId } = input;
+  try {
+    if (ownerId) {
+      await db("meeting_room").where({ meetingId, ownerId }).del();
+      return "A user left the meeting";
+    }
+    let test = await db("meeting_room").where({ meetingId, memberId });
+    console.log(test);
+    await db("meeting_room").where({ meetingId, memberId }).del();
+    pubsub.publish(constants.MEMBER_LEFT, {
+      memberLeft: `A user left the meeting`,
+    });
+    return "A user left the meeting";
+  } catch (error) {
+    return new Error("Something went wrong");
+  }
 };

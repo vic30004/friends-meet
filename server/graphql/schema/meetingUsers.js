@@ -2,7 +2,7 @@ const MeetingUsers = `
 type MeetingUsers{
     id:ID!,
     name:String, 
-    email: String!,
+    email: String,
     meetingId:ID,
 }
 input MeetingUsersId {

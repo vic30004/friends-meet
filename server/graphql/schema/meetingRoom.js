@@ -15,12 +15,23 @@ type Query{
 }
 
 input Member{
-    meetingId: ID!
+    meetingId: ID
     email: String!
+}
+
+input RemoveMember{
+    meetingId: ID!
+    memberId: ID
+    owner: ID
 }
 type Mutation{
     addMember(input:Member):MeetingRoom
-    removeMember(input:Member): String
+    removeMember(input:RemoveMember): String
+}
+
+type Subscription{
+    memberJoined: String
+    memberLeft: String
 }
 `;
 

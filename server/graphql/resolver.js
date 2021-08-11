@@ -14,8 +14,8 @@ const {
   getOwner,
   getMember,
   addMember,
+  removeMember,
 } = require("./resolver/meetingRoom");
-const Meeting = require("./schema/meetingSchema");
 const pubsub = new PubSub();
 
 const resolvers = {
@@ -80,16 +80,25 @@ const resolvers = {
       return updateMeetingUserName(input, db);
     },
     async AddComment(_, { input }, { db }) {
-      return addComment(input, db);
+      return addComment(input, db, pubsub);
     },
 
     async addMember(_, { input }, { db }) {
-      return addMember(input, db);
+      return addMember(input, db, pubsub);
+    },
+    async removeMember(_, { input }, { db }) {
+      return removeMember(input, db, pubsub);
     },
   },
   Subscription: {
     newComment: {
       subscribe: () => pubsub.asyncIterator([constants.NEW_COMMENT]),
+    },
+    memberJoined: {
+      subscribe: () => pubsub.asyncIterator([constants.MEMBER_JOINED]),
+    },
+    memberLeft: {
+      subscribe: () => pubsub.asyncIterator([constants.MEMBER_LEFT]),
     },
   },
 };

@@ -1,9 +1,14 @@
 exports.up = function (knex) {
   return knex.schema.createTable("meeting_room", (t) => {
     t.increments("id").primary();
-    t.integer("userId")
+    t.integer("ownerId")
       .references("id")
       .inTable("users")
+      .onUpdate("CASCADE")
+      .onDelete("CASCADE");
+    t.integer("memberId")
+      .references("id")
+      .inTable("meeting_users")
       .onUpdate("CASCADE")
       .onDelete("CASCADE");
     t.integer("meetingId")
