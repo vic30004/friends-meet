@@ -12,6 +12,7 @@ exports.meeting = async (input, db) => {
 };
 
 exports.createMeeting = async (input, db) => {
+  console.log(input);
   const { ownerId } = input;
 
   const linkId = randomIdGen();

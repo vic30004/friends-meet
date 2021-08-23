@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { Button } from "../../components/Button/Button";
-import Form from "../../components/Form/Form";
-import Input from "../../components/Input/Input";
-import useForm from "../../hooks/UseForm";
+import { Button } from "../Button/Button";
+import Form from "../Form/Form";
+import Input from "../Input/Input";
+import { useMutation } from "@apollo/client";
+import { ADD_USER_TO_MEETING } from "../../graphql/meetingUsers";
 
-const AddUserForm = ({ setMeetingCreated }) => {
+const AddUserForm = ({ setMeetingCreated, meetingId }) => {
   const [email, setEmail] = useState("");
   const [emails, setEmails] = useState([]);
+  const [addUserToMeeting, { data, loading, error }] =
+    useMutation(ADD_USER_TO_MEETING);
+
   const handleChange = (e) => {
     setEmail(e.target.value);
   };
@@ -25,8 +29,17 @@ const AddUserForm = ({ setMeetingCreated }) => {
     emails.push(email);
     setEmail("");
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    for (let val of emails) {
+      try {
+        await addUserToMeeting({
+          variables: { addUserToMeetingInput: { email: val, meetingId } },
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
     setMeetingCreated(false);
   };
   return (

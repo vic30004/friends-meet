@@ -1,0 +1,24 @@
+{
+  "name": "friends-meet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vic30004/friends-meet.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vic30004/friends-meet/issues"
+  },
+  "homepage": "https://github.com/vic30004/friends-meet#readme",
+  "dependencies": {
+    "concurrently": "^6.2.1"
+  }
+}

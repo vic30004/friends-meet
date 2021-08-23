@@ -20,7 +20,7 @@ input AddUserToMeeting{
 input UpdateUser{
     email:String
     name:String
-    id: ID!
+    meetingId: ID!
 }
 
 type Mutation{

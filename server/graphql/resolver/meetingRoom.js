@@ -36,11 +36,12 @@ exports.addMember = async (input, db, pubsub) => {
     memberId = null;
     ownerId = user[0].id;
   }
-
+  console.log(user);
   if (user.length > 0) {
     try {
       if (ownerId) {
         const meeting = await db("meetings").where({ ownerId, id: meetingId });
+        console.log(meeting);
         if (meeting.length === 0) {
           return new Error(
             "oops, it looks like you were not invited to this meeting."
@@ -58,7 +59,7 @@ exports.addMember = async (input, db, pubsub) => {
           .insert({ ownerId, meetingId })
           .returning("*");
         pubsub.publish(constants.MEMBER_JOINED, {
-          memberJoined: `${user[0].name} joined the room`,
+          memberJoined: { ...user[0] },
         });
         return { ...addedUser[0] };
       }
@@ -74,7 +75,7 @@ exports.addMember = async (input, db, pubsub) => {
         .insert({ memberId, meetingId })
         .returning("*");
       pubsub.publish(constants.MEMBER_JOINED, {
-        memberJoined: `${user[0].name} joined the room`,
+        memberJoined: { ...user[0] },
       });
       return { ...addedUser[0] };
     } catch (error) {
@@ -93,7 +94,6 @@ exports.removeMember = async (input, db, pubsub) => {
       return "A user left the meeting";
     }
     let test = await db("meeting_room").where({ meetingId, memberId });
-    console.log(test);
     await db("meeting_room").where({ meetingId, memberId }).del();
     pubsub.publish(constants.MEMBER_LEFT, {
       memberLeft: `A user left the meeting`,

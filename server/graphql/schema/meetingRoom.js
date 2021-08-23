@@ -30,7 +30,7 @@ type Mutation{
 }
 
 type Subscription{
-    memberJoined: String
+    memberJoined: MeetingUsers
     memberLeft: String
 }
 `;

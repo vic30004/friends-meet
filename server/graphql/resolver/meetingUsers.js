@@ -7,7 +7,6 @@ exports.meetingUsers = async (input, db) => {
 
 exports.addUserToMeeting = async (input, db) => {
   const { email, meetingId } = input;
-
   const checkIfUserInMeeting = await db("meeting_users").where({
     email,
     meetingId,
@@ -26,7 +25,7 @@ exports.addUserToMeeting = async (input, db) => {
 };
 
 exports.updateMeetingUserName = async (input, db) => {
-  const { email, name, id } = input;
+  const { email, name, meetingId } = input;
 
   if (email) {
     if (!emailCheck(email)) {
@@ -34,7 +33,7 @@ exports.updateMeetingUserName = async (input, db) => {
     }
 
     const user = await db("meeting_users")
-      .where({ id, email })
+      .where({ meetingId, email })
       .update({ name })
       .returning("*");
     return { ...user[0] };
